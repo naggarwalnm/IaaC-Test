@@ -9,6 +9,40 @@ trigger:
 pool:
   vmImage: ubuntu-latest
 
+variables:
+  - name: azureServiceConnection
+    value: 'azureServiceConnection'
+stages:
+
+- stage: DeployDEV
+  displayName: 'Deploy To DEV'
+  variables:
+    - group: 'YAML-Releases-DEV'
+
+  jobs:
+      - deployments:
+        pool:
+        vmImage: 'windows-2022'
+        environment: 'DEV'
+        strategy:
+        runOnce:
+        deploy:
+        steps:
+        - task: TerraformTaskV4@4
+          inputs:
+           provider: 'azurerm'
+           command: 'init'
+           backendServiceArm: 'ENT-M01(6a3eabb6-0b94-42a4-afaa-23ff6af2f982)'
+           backendAzureRmResourceGroupName: 'rsg-global-m-tfstate-01'
+           backendAzureRmStorageAccountName: 'strglobaltfstate'
+           backendAzureRmContainerName: 'iaac-test'
+           backendAzureRmKey: 'iaac-test'
+
+
+ 
+
+
+
 steps:
 - script: echo Hello, world!
   displayName: 'Run a one-line script'
